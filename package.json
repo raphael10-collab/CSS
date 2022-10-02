@@ -1,0 +1,253 @@
+{
+  "name": "CSS",
+  "productName": "CSS",
+  "version": "1.0.0",
+  "description": "CSS",
+  "main": ".webpack/main",
+  "scripts": {
+    "watch": "node ./src/app_S/min/scripts/watch.js",
+    "buildMain": "node ./src/app_S/min/scripts/buildMain.js",
+    "buildBrowser": "node ./src/app_S/min/scripts/buildBrowser.js",
+    "buildBrowserStyles": "node ./src/app_S/min/scripts/buildBrowserStyles.js",
+    "buildPreload": "node ./src/app_S/min/scripts/buildPreload.js",
+    "build": "yarn run buildMain && yarn run buildBrowser && yarn run buildBrowserStyles && yarn run buildPreload",
+    "buildWindows": "npm run build && node ./src/app_S/min/scripts/buildWindows.js",
+    "buildMacIntel": "npm run build && node ./src/app_S/min/scripts/buildMac.js --platform=x86",
+    "buildMacArm": "npm run build && node ./src/app_S/min/scripts/buildMac.js --platform=arm64",
+    "buildDebian": "npm run build && node ./src/app_S/min/scripts/buildDebian.js --platform=amd64",
+    "buildRaspi": "npm run build && node ./src/app_S/min/scripts/buildDebian.js --platform=armhf",
+    "buildLinuxArm64": "npm run build && node ./src/app_S/min/scripts/buildDebian.js --platform=arm64",
+    "buildRedhat": "npm run build && node ./src/app_S/min/scripts/buildRedhat.js",
+    "buildAll": "npm run buildWindows && npm run buildMacIntel && npm run buildMacArm && npm run buildDebian && npm run buildRedhat && npm run buildRaspi && npm run buildLinuxArm64 && npm run buildAppImage",
+    "buildAppImage": "npm run build && node ./src/app_S/min/scripts/buildAppImage.js",
+    "start": "yarn run build && concurrently \"yarn run watch\" \"electron-forge start --inspect-electron\"",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint --ext .ts,.tsx .",
+    "tailwind": "npx tailwindcss -i ./src/app_S/index.css -o ./src/app_S/tailwind.css --minify --watch"
+  },
+  "keywords": [],
+  "author": "raphy",
+  "license": "UNLICENSED",
+  "extraResources": [
+    "./node_modules/@electron/remote/**"
+  ],
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "executableName": "playground"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "forgetypescriptreactwebpack"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {
+            "maintainer": "Raphael Stonehorse"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip"
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ],
+      "plugins": [
+        [
+          "@electron-forge/plugin-webpack",
+          {
+            "devServer": {
+              "client": {
+                "logging": "info",
+                "overlay": {
+                  "errors": true,
+                  "warnings": false
+                }
+              },
+              "allowedHosts": [
+                "all"
+              ],
+              "devMiddleware": {
+                "index": false
+              }
+            },
+            "mainConfig": "./webpack.main.config.js",
+            "devContentSecurityPolicy": "default-src 'unsafe-eval' 'self'; script-src-elem 'self' 'unsafe-inline'; img-src *; style-src 'self' 'unsafe-inline'; font-src 'self' https://static2.sharepointonline.com; connect-src 'self' https: http:",
+            "renderer": {
+              "config": "./webpack.renderer.config.js",
+              "entryPoints": [
+                {
+                  "html": "./src/app/index.html",
+                  "js": "./src/app/renderer.ts",
+                  "preload": {
+                    "js": "./src/main/preload/preload.ts"
+                  },
+                  "name": "main_window"
+                },
+                {
+                  "html": "./src/app_S/index_S.html",
+                  "js": "./src/app_S/renderer_S.ts",
+                  "css": ["./src/app_S/min/dist/bundle.css", "./src/app_S/min/ext/iconfont.css"],
+                  "preload": {
+                    "js": "./src/main/preload/preload.ts"
+                  },
+                  "name": "search_window"
+                }
+              ]
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/plugin-syntax-top-level-await": "^7.14.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-react": "^7.17.12",
+    "@babel/preset-typescript": "^7.17.12",
+    "@cliqz/adblocker-electron": "^1.25.1",
+    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-flatpak": "^6.0.0-beta.63",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
+    "@electron-forge/maker-snap": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-zip": "^6.0.0-beta.63",
+    "@electron-forge/plugin-electronegativity": "^6.0.0-beta.63",
+    "@electron-forge/plugin-webpack": "6.0.0-beta.63",
+    "@hot-loader/react-dom": "^17.0.2",
+    "@tailwindcss/forms": "^0.5.2",
+    "@tailwindcss/typography": "^0.5.3",
+    "@types/better-sqlite3": "^7.5.0",
+    "@types/chrome": "^0.0.190",
+    "@types/fs-extra": "^9.0.13",
+    "@types/jszip": "^3.4.1",
+    "@types/lodash": "^4.14.182",
+    "@types/luxon": "^2.3.2",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.5",
+    "@types/react-redux": "^7.1.24",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/redux-logger": "^3.0.9",
+    "@types/redux-mock-store": "^1.0.3",
+    "@types/redux-thunk": "^2.1.0",
+    "@types/styled-components": "^5.1.25",
+    "@types/webpack-env": "^1.17.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vercel/webpack-asset-relocator-loader": "1.7.0",
+    "archiver": "^5.3.1",
+    "astroturf": "^1.0.1",
+    "autoprefixer": "^10.4.7",
+    "babel-loader": "^8.2.5",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "browserify": "^17.0.0",
+    "concurrently": "^7.4.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.1",
+    "decomment": "^0.9.5",
+    "electron": "^17.2.0",
+    "electron-builder": "^23.3.3",
+    "electron-extensions": "^7.0.0-beta.3",
+    "electron-installer-windows": "^3.0.0",
+    "electron-packager": "^16.0.0",
+    "electron-renderify": "^0.0.2",
+    "electron-store": "^8.0.2",
+    "electron-updater": "^5.2.1",
+    "electron-window-state": "^5.0.3",
+    "eslint": "^8.0.1",
+    "eslint-plugin-import": "^2.25.0",
+    "file-type": "^18.0.0",
+    "font-list": "^1.4.5",
+    "fork-ts-checker-webpack-plugin": "^7.2.11",
+    "icojs": "^0.17.0",
+    "js-md5": "^0.7.3",
+    "jszip": "^3.10.1",
+    "keytar": "^7.9.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "mobx": "^6.6.2",
+    "mobx-react-lite": "^3.4.0",
+    "node-bookmarks-parser": "^2.0.0",
+    "node-loader": "^2.0.0",
+    "postcss": "^8.4.14",
+    "postcss-js": "^4.0.0",
+    "postcss-loader": "^7.0.0",
+    "postcss-nested": "^5.0.6",
+    "prebuild-install": "^7.1.1",
+    "process": "^0.11.10",
+    "react-windows-controls": "^1.1.1",
+    "reselect": "^4.1.6",
+    "style-loader": "^3.3.1",
+    "tailwindcss": "^3.1.6",
+    "ts-loader": "^9.3.0",
+    "typescript": "~4.5.4"
+  },
+  "dependencies": {
+    "@electron/remote": "^2.0.8",
+    "@fluentui/react": "8.91.1",
+    "@reduxjs/toolkit": "^1.8.3",
+    "assert": "^2.0.0",
+    "buffer": "^6.0.3",
+    "classnames": "^2.3.1",
+    "core-js": "^3.23.3",
+    "dexie": "^3.2.2",
+    "dragula": "^3.7.3",
+    "electron-log": "^4.4.7",
+    "electron-squirrel-startup": "^1.0.0",
+    "expr-eval": "^2.0.2",
+    "fs-extra": "^10.1.0",
+    "https-browserify": "^1.0.0",
+    "jsonfile": "^6.1.0",
+    "lodash": "^4.17.21",
+    "mousetrap": "^1.6.5",
+    "nedb": "^1.8.0",
+    "node-abi": "^3.25.0",
+    "node-fetch": "^3.2.6",
+    "node-html-parser": "^5.3.3",
+    "node-ipc": "^11.1.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "polate-js": "^1.0.6",
+    "prismjs": "^1.28.0",
+    "react": "^18.1.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "^18.1.0",
+    "react-dropzone": "^14.2.1",
+    "react-hot-loader": "^4.13.0",
+    "react-icons": "^4.4.0",
+    "react-intl-universal": "^2.5.3",
+    "react-redux": "^8.0.2",
+    "react-router-dom": "^6.3.0",
+    "react-select": "^5.3.2",
+    "redux-logger": "^3.0.6",
+    "redux-mock-store": "^1.5.4",
+    "redux-thunk": "^2.4.1",
+    "regedit": "^5.1.1",
+    "regenerator-runtime": "^0.13.9",
+    "stemmer": "^2.0.0",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "string_score": "^0.1.22",
+    "styled-components": "^5.3.5",
+    "timers-browserify": "^2.0.12",
+    "url": "^0.11.0",
+    "util": "^0.12.4",
+    "uuid": "^8.3.2"
+  }
+}
